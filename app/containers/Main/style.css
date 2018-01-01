@@ -1,0 +1,17 @@
+.hint{
+  display: none;
+}
+
+.hoverable:hover .hint{
+  display: block;
+  background-color: brown;
+  opacity: 0.6;
+  color: antiquewhite;
+  text-align: center;
+}
+
+
+
+
+
+

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { Dialog, FlatButton } from 'material-ui';
+import { Paper } from 'material-ui';
 
 import { createStructuredSelector } from 'reselect';
 import injectSaga from 'utils/injectSaga';
@@ -17,12 +17,14 @@ import {
   dialogContainer,
   dialogContainerImage,
   dialogContainerSlider,
-  gridStyle,
   searchStyle,
   headerStyle,
+  gridContainer,
+  imgStyle,
  } from './mainStyle';
 
-import Grid from '../../components/grid/Grid';
+import './style.css';
+// import Grid from '../../components/grid/Grid';
 import SliderComponent from '../../components/Slider/Slider';
 
 // eslint-disable-next-line
@@ -32,7 +34,7 @@ export class Main extends React.Component {
     margin: '5 auto',
     paddingTop: '6%',
     srcValue: '',
-    open: false,
+    display: 'none',
   };
 
   handleSeachBarChanged = (event) => {
@@ -41,23 +43,17 @@ export class Main extends React.Component {
 
   handleRequestSearch = () => {
     this.props.onRequestSearch();
-    this.setState({ paddingTop: '0px' });
+    this.setState({ paddingTop: '0%' });
   };
 
   handleGetImage = (event) => {
     const srcValue = event.target.src;
-    this.setState({ srcValue, open: true });
-  };
-
-  handleClose = () => {
-    this.setState({ open: false });
+    this.setState({ srcValue, display: 'flex' });
   };
 
   render() {
     const { images } = this.props;
     const { srcValue } = this.state;
-    const actions = [<FlatButton label="Cancel" primary onClick={this.handleClose} />];
-
     return (
       <div style={{ width: this.state.width, margin: this.state.margin, paddingTop: this.state.paddingTop }}>
 
@@ -73,31 +69,40 @@ export class Main extends React.Component {
           />
         </div>
 
-        <div style={gridStyle}>
+        <div>
           {
-            !images.length === 0 ? null : (<Grid images={images} clickedImage={this.handleGetImage} />)
+            !images ? (
+              <div style={{ textAlign: 'center' }}>Loading Images...</div>
+              ) : (
+                <div style={gridContainer}>
+                  {images.map((image) => (
+                    <div className="hoverable">
+                      <span className="hint">image from flicker api</span>
+                      <img
+                        src={image.src}
+                        onClick={this.handleGetImage}
+                        alt="loadingImages"
+                        width="100%"
+                        height="100%"
+                        style={imgStyle}
+                        role="presentation"
+                      />
+                    </div>
+                  ))}
+                </div>
+            )
           }
         </div>
 
-        <div>
-          <Dialog
-            title="Image and Slider"
-            actions={actions}
-            modal={false}
-            open={this.state.open}
-            onRequestClose={this.handleClose}
-            autoScrollBodyContent
-          >
-            <div style={dialogContainer}>
-              <div style={dialogContainerImage}>
-                <img src={srcValue} alt="load" width="100%" height="100%" />
-              </div>
-              <div style={dialogContainerSlider}>
-                <SliderComponent images={images} />
-              </div>
-            </div>
-          </Dialog>
-        </div>
+        <Paper style={{ display: this.state.display, ...dialogContainer }}>
+          <div style={dialogContainerImage}>
+            <img src={srcValue} alt="load" width="100%" height="100%" />
+          </div>
+
+          <div style={dialogContainerSlider}>
+            <SliderComponent images={images} />
+          </div>
+        </Paper>
 
       </div>
     );
@@ -107,14 +112,22 @@ export class Main extends React.Component {
 Main.propTypes = {
   onSeachBarChange: PropTypes.func.isRequired,
   onRequestSearch: PropTypes.func.isRequired,
-  images: PropTypes.array,
+  images: PropTypes.arrayOf(PropTypes.object),
 };
 
-const mapStateToProps = createStructuredSelector({ main: makeSelectMain(), images: makeSelectImages() });
+const mapStateToProps = createStructuredSelector({
+  main: makeSelectMain(),
+  images: makeSelectImages(),
+});
 
 function mapDispatchToProps(dispatch) {
   return {
-    onSeachBarChange: (searchInputName, value) => dispatch(mainActions.searchBarchanged({ inputName: searchInputName, inputValue: value })),
+    onSeachBarChange: (searchInputName, value) => dispatch(
+      mainActions.searchBarchanged({
+        inputName: searchInputName,
+        inputValue: value,
+      })
+    ),
     onRequestSearch: () => dispatch(mainActions.requestSearch()),
   };
 }

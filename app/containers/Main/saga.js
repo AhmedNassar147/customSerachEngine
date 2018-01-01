@@ -21,7 +21,7 @@ export function* requestSearch() {
 const makeRequest = async (text) => {
   const res = await axios.get(apiUrl(text));
   return res.data.photos.photo
-    .slice(0, 60)
+    .slice(0, 24)
     .filter((photo) => photo.url_o)
     .map((photo) => ({
       src: photo.url_o,

@@ -10,19 +10,21 @@ export default class SliderComponent extends React.Component {
     return (
       <CarouselProvider
         naturalSlideWidth={100}
-        naturalSlideHeight={100}
-        totalSlides={60}
+        naturalSlideHeight={35}
+        totalSlides={20}
       >
-        {
-        !(images.length === 0) && (
-          <Slider>
-            {images.map((image, key) => (
-              <Slide index={key}><img src={image.src} alt="slider" width="100%" height="100%" /></Slide>
-            ))}
-          </Slider>
-        )}
         <ButtonBack>Back</ButtonBack>
         <ButtonNext>Next</ButtonNext>
+        {
+          !(images.length === 0) && (
+            <Slider>
+              {images.map((image, key) => (
+                <Slide index={key}>
+                  <img src={image.src} alt="sliderImages" height="100%" width="100%" />
+                </Slide>
+              ))}
+            </Slider>
+        )}
       </CarouselProvider>
     );
   }
